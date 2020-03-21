@@ -44,26 +44,27 @@ public class Problem2 {
         public void reduce(Text key, Iterable<FloatWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-            int sum = 0;
+            float sum = 0;
             int count = 0;
             for (FloatWritable val : values) {
             	count += 1;
                 sum += val.get();
             }
-            result.set((sum/count));
+            sum = sum/count;
+            result.set(sum);
             context.write(key, result);
         }
     }
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "Problem 1");
+        Job job = Job.getInstance(conf, "Problem 2");
         job.setJarByClass(Problem2.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(AvgRatingsReducer.class);
         job.setReducerClass(AvgRatingsReducer.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
+        job.setOutputValueClass(FloatWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
